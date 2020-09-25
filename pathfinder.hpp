@@ -8,36 +8,12 @@
 using namespace std;
 
 // ############################################################################
-// ### General Explanations
-// ############################################################################
-
-// The purpose is to implement a function FindPath(...) to find one of the
-// shortest path between a Start location and a Target location within a
-// map composed of cells, some are impassible.
-
-// The algorithm A* was used for this.
-// The idea is to begin with Start location, and explore one by one
-// the adjacent cells, priorityzing the most promising cells first.
-// For each new explored cells, the previous cell in shortest path
-// is stored - it will be used to recompute the shortest path at the end.
-// The priority score is in party based on an estimation (called heuristics)
-// of the distance of the current cell to the Target. 
-// Here we choose a heuristics that cannot overestimate the actual distance.
-// It can then be proven that A* algorythm is guaranteed to find the
-// shortest path.
-
-// Since we prioritized most promising cells, the algo is significantly
-// faster than one that would explore the full map.
-
-// More on A* : https://en.wikipedia.org/wiki/A*_search_algorithm
-
-// ############################################################################
 // ### Unit tests
 // ############################################################################
 
 // Unit tests were written using Catch2 framework.
 // They cannot be submitted with the solution, but they can be found here :
-// TODO set github and paste link
+// https://github.com/aurelien-delay/pathfinder/tree/master/test
 
 // ############################################################################
 // ### In multi thread environment
@@ -50,16 +26,35 @@ using namespace std;
 // - pMap is const in all threads
 // - pOutBuffer is not shared (each thread has its own instance)
 
+// Making the function thread safe, i.e. supporting that pMap and pOutBuffer
+// are shared among several threads would necessitate to just lock the full function
+// and disabling thus parrarel execution. 
+// Ensuring Reentrancy was deemed enough.
+
 // ############################################################################
 // ### HEADERS
 // ############################################################################
 
+/*! \brief  API to implement, finding the shortest path between Start and Target
+ *          in the input map.
+ * 
+ *  \return length of the shortest path, or -1 if none can be found.
+ *  \throw  BadInputException if the following conditions are not respected in input
+ *          1≤nMapWidth,nMapHeight
+ *          0≤nStartX,nTargetX<nMapWidth
+ *          0≤nStartY,nTargetY<nMapHeight
+ *          Both Start and Target are empty locations
+ *          nOutBufferSize≥0.
+ */
 int FindPath(const int nStartX, const int nStartY,
              const int nTargetX, const int nTargetY, 
              const unsigned char* pMap, const int nMapWidth, const int nMapHeight,
              int* pOutBuffer, const int nOutBufferSize);
 
-
+/*! \brief Coordinates on the 2D map.
+ *
+ *  With appropriate operators in order to be used in maps and queues.
+ */
 struct Coordinates
 {
   Coordinates(): X(-1), Y(-1) {}
@@ -70,6 +65,7 @@ bool operator==(const Coordinates& lhs, const Coordinates& rhs);
 bool operator!=(const Coordinates& lhs, const Coordinates& rhs);
 bool operator<(const Coordinates& lhs, const Coordinates& rhs);
 
+/*! \brief Class describing and providing all operations pertaining to the map. */
 class Map
 {
   public:
@@ -90,6 +86,7 @@ class Map
   int _mapWidth, _mapHeight;
 };
 
+/*! \brief Central class that will process A* algorythm to find shortest path  */
 class Pathfinder
 {
   public:
@@ -114,6 +111,7 @@ class Pathfinder
   int _outBufferSize;
 };
 
+/*! \brief Exception to return if the input does not respect the rules  */
 class BadInputException : public exception
 {
     string _msg;
@@ -126,11 +124,13 @@ public:
     }
 };
 
-// --- Override std::priority_queue, to be more user-friendly in code ---
-// in case of tie, the queue has a FIFO dequeue order.
-// ex: PriorityQueue<Coordinates> q;
-// to enqueue : q.put(Coordinates(0,0), 12);  where 12 is the priority
-// to dequeue item with lower priority : q.get();
+/*! \brief Override std::priority_queue, to be more user-friendly in code
+ *
+ *  in case of tie, the queue has a FIFO dequeue order.
+ *  ex: PriorityQueue<Coordinates> q;
+ *  to enqueue : q.put(Coordinates(0,0), 12);  where 12 is the priority
+ *  to dequeue item with lower priority : Coordinates coord = q.dequeue();
+ */
 bool operator<(const pair<int, time_t>& lhs, const pair<int, time_t>& rhs);
 template<typename T>
 struct PriorityQueue {

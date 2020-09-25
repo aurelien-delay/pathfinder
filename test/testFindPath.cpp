@@ -79,11 +79,13 @@ TEST_CASE("findPath - Start and Target are the same location")
   const int mapHeight = 2;
   unsigned char pMap[mapWidth*mapHeight] ={1, 1,
                                            1, 1};
-  const int outBufferSize = 10;
+  const int outBufferSize = 1;
   int outputBuffer[outBufferSize];
+  int bufferInit = outputBuffer[0];
 
   const int length = FindPath(start.X, start.Y, target.X, target.Y, pMap, mapWidth, mapHeight, outputBuffer, outBufferSize);
   REQUIRE(length == 0);
+  CHECK(outputBuffer[0] == bufferInit); // check outputBuffer was not changed
 }
 
 TEST_CASE("findPath - Example provided by instructions 1")
@@ -215,6 +217,9 @@ TEST_CASE("findPath - Several paths, only one is the shortest path")
   CHECK(outputBuffer[18] == 89);
   CHECK(outputBuffer[19] == 99);
 }
+
+
+
 
 TEST_CASE("findPath - Bad map size input, throw exception")
 {

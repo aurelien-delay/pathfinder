@@ -158,19 +158,23 @@ TEST_CASE("Map - find neighbors : for a given Cell, find the adjacent cells that
   CHECK( *next(result.begin(), 3) == Coordinates(2,2) );
 
   result = _map.findNeighbors(Coordinates(2,2));
+  REQUIRE(result.size() == 2);
   CHECK( *next(result.begin(), 0) == Coordinates(2,3) );
   CHECK( *next(result.begin(), 1) == Coordinates(1,2) );
 
   result = _map.findNeighbors(Coordinates(0,3));
+  REQUIRE(result.size() == 2);
   CHECK( *next(result.begin(), 0) == Coordinates(0,2) );
   CHECK( *next(result.begin(), 1) == Coordinates(1,3) );
 
   result = _map.findNeighbors(Coordinates(1,3));
+  REQUIRE(result.size() == 3);
   CHECK( *next(result.begin(), 0) == Coordinates(1,2) );
   CHECK( *next(result.begin(), 1) == Coordinates(0,3) );
   CHECK( *next(result.begin(), 2) == Coordinates(2,3) );
 
   result = _map.findNeighbors(Coordinates(2,3));
+  REQUIRE(result.size() == 2);
   CHECK( *next(result.begin(), 0) == Coordinates(2,2) );
   CHECK( *next(result.begin(), 1) == Coordinates(1,3) );
 }
